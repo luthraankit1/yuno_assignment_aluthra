@@ -1,0 +1,34 @@
+services:
+
+  sqlserver:
+    image: db
+    restart: unless-stopped
+    environment:
+      SA_PASSWORD: Abcd@1234
+      TZ: Asia/Calcutta
+    ports:
+      - "1433:1433"
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    volumes:
+      - ./redis/volume/data:/data
+    ports:
+      - "6379:6379"
+
+  application:
+    restart: unless-stopped
+    image: app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver;databaseName=db1;integratedSecurity=false;TrustServerCertificate=true
+      SPRING.DATASOURCE.USERNAME: sa
+      SPRING.DATASOURCE.PASSWORD: Abcd@1234
+      SPRING_REDIS_HOST: redis
+    ports:
+      - "8080:8080"
+    depends_on:
+      - sqlserver
+      - redis
+    volumes:
+      - ./app/volume/:/home/ubuntu/jar
