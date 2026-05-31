@@ -28,3 +28,4 @@ out/
 !**/src/test/**/out/
 
 *.rdb
+*.jar

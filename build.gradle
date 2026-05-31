@@ -39,4 +39,20 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+
+    // Run subsets: gradlew test -PtestTags=integration
+    if (project.hasProperty('testTags')) {
+        def tags = project.property('testTags').toString().split(',')
+        useJUnitPlatform {
+            tags.each { includeTags it.trim() }
+        }
+    }
+}
+
+tasks.register("deploy-jar", Copy) {
+    group 'deploy-local'
+    dependsOn bootJar
+    from(bootJar)
+    into("./docker/app/volume")
+    rename(rootProject.name + "-" + version + ".jar", "application.jar")
 }
