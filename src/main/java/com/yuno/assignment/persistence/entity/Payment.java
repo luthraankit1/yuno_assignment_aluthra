@@ -32,7 +32,7 @@ public class Payment {
     @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
-    @Column(name = "country", length = 2)
+    @Column(name = "country", length = 3)
     private String country;
 
     @Column(name = "payment_method_token", nullable = false, length = 128)

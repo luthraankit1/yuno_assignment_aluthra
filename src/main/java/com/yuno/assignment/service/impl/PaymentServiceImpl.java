@@ -123,7 +123,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             if (response.isSuccess()) {
                 completeAttempt(attempt, Status.SUCCEEDED, response.getProviderReference(), null, null);
-                updatePaymentStatus(payment, lastProvider, null, Status.SUCCEEDED);
+                updatePaymentStatus(payment, lastProvider, response.getProviderReference(), Status.SUCCEEDED);
                 return;
             }
 
@@ -162,19 +162,24 @@ public class PaymentServiceImpl implements PaymentService {
         });
     }
 
-    private void updatePaymentStatus(Payment payment, PaymentProvider paymentProvider, String info, Status Status) {
-        transactionTemplate.executeWithoutResult(status -> {
+    private void updatePaymentStatus(Payment payment, PaymentProvider paymentProvider, String info, Status status) {
+        transactionTemplate.executeWithoutResult(transactionStatus -> {
             Payment managed = paymentRepository.findById(payment.getId())
                     .orElseThrow(() -> new IllegalStateException(
                             "Payment vanished before status update: " + payment.getId()));
 
-            switch (Status) {
+            switch (status) {
                 case SUCCEEDED:
                     managed.markSucceeded(paymentProvider, info);
+                    break;
                 case FAILED:
                     managed.markFailed(paymentProvider, info);
+                    break;
                 case IN_PROGRESS:
-                    managed.setStatus(Status);
+                    managed.setStatus(status);
+                    break;
+                default:
+                    break;
             }
             paymentRepository.save(managed);
         });
