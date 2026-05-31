@@ -14,7 +14,7 @@ public class PaymentRequest {
     @Size(min = 10, max = 64)
     String customerId;
 
-    @NotBlank
+    @NotNull
     @DecimalMin(value = "1.00", message = "amount must be at least 1.00")
     BigDecimal amount;
 
